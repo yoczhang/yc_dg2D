@@ -1,0 +1,28 @@
+border a1(t=0,2){x=t;y=0;};
+border a2(t=0,0.5){x=2;y=t;};
+border a3(t=2,2.5){x=t;y=0.5;};
+border a4(t=0.5,0){x=2.5;y=t;};
+border a5(t=2.5,10){x=t;y=0;};
+border a6(t=0,1){x=10;y=t;};
+border a7(t=10,0){x=t;y=1;};
+border a8(t=1,0){x=0;y=t;};
+
+int n=5;
+mesh Th=buildmesh(a1(4*n)+a2(n)+a3(n)+a4(n)+a5(15*n)+a6(2*n)+a7(20*n)+a8(2*n));
+
+plot(Th);
+
+ofstream ff("Stokes_elem.dat");
+for(int i=0;i<Th.nt;i++)
+{
+for(int j=0;j<3;j++)
+{
+ff<<i<<"      "<<j<<"      "<<Th[i][j]<<endl;
+}
+}
+
+ofstream fff("Stokes_nodes.dat");
+for(int i=0;i<Th.nv;i++)
+{
+fff<<i<<"      "<<Th(i).x<<"      "<<Th(i).y<<endl;
+}

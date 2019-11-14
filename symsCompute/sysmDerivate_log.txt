@@ -1,0 +1,29 @@
+phi = @(x,y) (1-theta).*exp(x)+(1-theta).*lambda_G/2.*exp(x)+exp(y)+lambda_G/2;
+phix = @(x,y) - exp(x).*(theta - 1) - (lambda_G.*exp(x).*(theta - 1))/2;
+phiy = @(x,y) exp(y);
+phixy = @(x,y) 0.*x; 
+phixx = @(x,y) - exp(x).*(theta - 1) - (lambda_G.*exp(x).*(theta - 1))/2;
+phiyy = @(x,y) exp(y);
+ 
+ 
+u1 = @(x,y) ((1-theta).*exp(x)+1).*(exp(y)+lambda_G);
+u1x = @(x,y) -exp(x).*(lambda_G + exp(y)).*(theta - 1);
+u1y = @(x,y) -exp(y).*(exp(x).*(theta - 1) - 1);
+u1xy = @(x,y) -exp(x).*exp(y).*(theta - 1);
+u1xx = @(x,y) -exp(x).*(lambda_G + exp(y)).*(theta - 1);
+u1yy = @(x,y) -exp(y).*(exp(x).*(theta - 1) - 1);
+ 
+ 
+u2 = @(x,y) (1-theta).*exp(x+y)+exp(y);
+u2x = @(x,y) -exp(x + y).*(theta - 1);
+u2y = @(x,y) exp(y) - exp(x + y).*(theta - 1);
+u2xy = @(x,y) -exp(x + y).*(theta - 1);
+u2xx = @(x,y) -exp(x + y).*(theta - 1);
+u2yy = @(x,y) exp(y) - exp(x + y).*(theta - 1);
+ 
+ 
+p = @(x,y) xi.*(cos(pi)+sin(pi)).*cos(pi.*y);
+px = @(x,y) 0.*x; 
+py = @(x,y) -pi.*xi.*sin(pi.*y).*(cos(pi) + sin(pi));
+ 
+ 

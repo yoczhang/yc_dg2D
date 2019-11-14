@@ -1,0 +1,462 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>dgTimeDecoupledSDT2</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-11-20"><meta name="DC.source" content="dgTimeDecoupledSDT2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Setting</a></li><li><a href="#3">Time setting</a></li><li><a href="#4">penalty pars setting</a></li><li><a href="#5">pde setting</a></li><li><a href="#6">equation</a></li></ul></div><pre class="codeinput"><span class="comment">%</span>
+<span class="comment">%   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</span>
+<span class="comment">%   %--------------------------------------------</span>
+<span class="comment">%       dgTimeDecoupledSDT2,</span>
+<span class="comment">%       for the transport eqn, have inflow and outflow boundaryEdges.</span>
+<span class="comment">%   %---------------------------------------------</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%   RATE OF CONVERGENCE OF DG METHOD FOR THE StokesDarcyTransport EQNs IN 2D</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%	YcZhang 18/11/2017</span>
+<span class="comment">%</span>
+<span class="comment">%   Last modified 18/11/2017</span>
+<span class="comment">%</span>
+
+
+clc
+clearvars; close <span class="string">all</span>;
+</pre><h2 id="2">Setting</h2><p>program setting</p><pre class="codeinput">option.L0 = 1; <span class="comment">% to uniformrefine the mesh and generate an initial mesh</span>
+option.maxIt = 4; <span class="comment">% to define the maximum circulation, to generate the Rate.</span>
+option.printlevel = 1;
+option.plotflag = 1;
+
+<span class="comment">% bases element setting</span>
+option.basesType_Fu = <span class="string">'P1'</span>;
+option.basesType_Fp = <span class="string">'P0'</span>;
+option.basesType_Pp = <span class="string">'P1'</span>;
+option.basesType_c = <span class="string">'P1'</span>;
+    <span class="comment">%&gt; here, F standsfor fluid region, P standsfor porous region, and T standsfor Transport eq.</span>
+</pre><h2 id="3">Time setting</h2><p>choose the time scheme</p><pre class="codeinput">option.theta = 1;
+    <span class="comment">%&gt; theta = 0, forward Euler (explicit Euler),</span>
+    <span class="comment">%&gt; theta = 1, backward Euler (implicit Euler),</span>
+    <span class="comment">%&gt; theta = 1/2, C-N.</span>
+
+<span class="comment">% set the terminal time</span>
+option.verifyCovergence = <span class="string">'space'</span>;
+    <span class="comment">% 'space' stands for we will vertify SPACE convergence order, so we will take Dt=1/1000,</span>
+    <span class="comment">% 'time' stands for we will veritfy TIME convergence order, so we will take very small h, and large Dt</span>
+<span class="keyword">if</span> strcmp(option.verifyCovergence, <span class="string">'space'</span>)
+    option.Dt = 1/10000;
+    option.startingT = 0;
+    option.terminalT = 0.01;
+<span class="keyword">end</span>
+</pre><h2 id="4">penalty pars setting</h2><pre class="codeinput">option.p_epsilon = -1; <span class="comment">% -1, SIPG; 1, NIPG; 0, IIPG; This is for the StokesDarcy eqn.</span>
+option.p_beta = 1;
+
+option.p_epsilon_c = -1; <span class="comment">% this is for the Transport eqn.</span>
+option.p_beta_c = 1;
+
+<span class="comment">%&gt; for the NIPG</span>
+<span class="keyword">if</span> option.p_epsilon == 1
+    option.p_sigma = 1;
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> option.p_epsilon_c == 1
+    option.p_sigma_c = 19;
+<span class="keyword">end</span>
+
+<span class="comment">%&gt; for the SIPG or IIPG</span>
+<span class="comment">%--- for the Stokes-Darcy</span>
+<span class="keyword">if</span> option.p_epsilon ~= 1 &amp;&amp; basesType2degreek(option.basesType_Fu) == 1
+    option.p_sigma = 19;
+<span class="keyword">elseif</span> option.p_epsilon ~= 1 &amp;&amp; basesType2degreek(option.basesType_Fu) == 2
+    option.p_sigma = 18;
+<span class="keyword">elseif</span> option.p_epsilon ~= 1 &amp;&amp; basesType2degreek(option.basesType_Fu) == 3
+    option.p_sigma = 36;
+<span class="keyword">elseif</span> option.p_epsilon ~= 1 &amp;&amp; basesType2degreek(option.basesType_Fu) == 4
+    option.p_sigma = 78;
+<span class="keyword">end</span>
+
+<span class="comment">%--- for the Transport eqn</span>
+<span class="keyword">if</span> option.p_epsilon_c ~= 1 &amp;&amp; basesType2degreek(option.basesType_c) == 1
+    option.p_sigma_c = 19;
+<span class="keyword">elseif</span> option.p_epsilon_c ~= 1 &amp;&amp; basesType2degreek(option.basesType_c) == 2
+    option.p_sigma_c = 96;
+<span class="keyword">elseif</span> option.p_epsilon_c ~= 1 &amp;&amp; basesType2degreek(option.basesType_c) == 3
+    option.p_sigma_c = 36;
+<span class="keyword">elseif</span> option.p_epsilon_c ~= 1 &amp;&amp; basesType2degreek(option.basesType_c) == 4
+    option.p_sigma_c = 78;
+<span class="keyword">end</span>
+
+
+<span class="comment">%--- for the Transport Adap Diffusivity Edges</span>
+option.p_epsilon1 = option.p_epsilon_c;
+option.p_sigma1 = option.p_sigma_c;
+</pre><h2 id="5">pde setting</h2><pre class="codeinput">pde = TimeDecoupledSDTData2(0,1); <span class="comment">% input: (coeff_case,u_case)</span>
+
+option.Darcy_p_sigma = pde.K; <span class="comment">% this is to control the penalty coefficient of Daryc eqn.</span>
+</pre><h2 id="6">equation</h2><pre class="codeinput">dgTimeDecoupledSDTEqn2(pde,option);
+
+<span class="comment">%-- end function</span>
+</pre><pre class="codeoutput">********************  dg Time-Stokes-Darcy Transport  ********************
+------------------------------------------------------
+Time-Stokes-Darcy Transport Equation:
+   phi = @(t,x,y)(exp(y)-exp(-y)).*sin(x).*exp(t)
+   u1 = @(t,x,y)(K/pi.*sin(2.*pi.*y).*cos(x)).*exp(t)
+   u2 = @(t,x,y)((-2.*K+K/pi.^2.*(sin(pi.*y)).^2).*sin(x)).*exp(t)
+   c = @(t,x,y)t*(cos(pi*x)+cos(pi*y))/pi
+    - - - - - - - - - - - - - - - - - - - - - -   
+Stokes eqn fluid kinematic viscosity:
+   mu = 0.01
+Darcy eqn PermeabilityCoefficient:
+   PermeabiltiyCoeff (i.e. pde.K) = 0.01
+Transport eqn DiffusivityCoefficient:
+   DiffusivityCoeff = 1e-05
+startingTime: 0
+terminalTime: 0.01
+    - - - - - - - - - - - - - - - - - - - - - -   
+DG parameters: 
+   basesType_phi: P1
+   basesType_u: P1
+   basesType_p: P0
+   basesType_c: P1
+   penalty pars: p_epsilon: -1
+   penalty pars: p_sigma: 19
+   penalty pars: Darcy_p_sigma: 0.01
+   penalty pars: p_beta: 1
+   penalty pars: p_epsilon_c: -1
+   penalty pars: p_sigma_c: 19
+   penalty pars: p_beta_c: 1
+   maxIt: 4
+------------------------------------------------------
+Solving dgTimeDecoupledSDT1: 
+------------------------------------------------------
+the 1-th cycle(i.e. the 1-th mesh)
+Stokes domain: [0,1]x[0,1].
+Darcy domain: [0,1]x[-1,0].
+Dt = 0.0001
+NT = 100
+condition number of Stokes-Darcy Matrix: 47116212.6183
+assemble Stokes-Darcy Matrix time: 0.20494
+in the 0-th time iteration, t=0
+in the 11-th time iteration, t=0.0011
+in the 21-th time iteration, t=0.0021
+in the 31-th time iteration, t=0.0031
+in the 41-th time iteration, t=0.0041
+in the 51-th time iteration, t=0.0051
+in the 61-th time iteration, t=0.0061
+in the 71-th time iteration, t=0.0071
+in the 81-th time iteration, t=0.0081
+in the 91-th time iteration, t=0.0091
+solve the Time-Stokes-Darcy-Transport system: 9.976
+terminal Time in program:0.01
+the solve-func time: 15.62
+compute Err time: 0.07
+uh_L2_error(1) = 0.00032663
+uh_H1_error(1) = 0.0066569
+ph_L2_error(1) = 0.00039856
+phih_L2_error(1) = 0.010866
+phih_H1_error(1) = 0.21929
+ch_L2_error(1) = 0.00011069
+ch_H1_error(1) = 0.0032508
+------------------------------------------------------
+the 2-th cycle(i.e. the 2-th mesh)
+Stokes domain: [0,1]x[0,1].
+Darcy domain: [0,1]x[-1,0].
+Dt = 0.0001
+NT = 100
+condition number of Stokes-Darcy Matrix: 49940054.0448
+assemble Stokes-Darcy Matrix time: 0.38869
+in the 0-th time iteration, t=0
+in the 11-th time iteration, t=0.0011
+in the 21-th time iteration, t=0.0021
+in the 31-th time iteration, t=0.0031
+in the 41-th time iteration, t=0.0041
+in the 51-th time iteration, t=0.0051
+in the 61-th time iteration, t=0.0061
+in the 71-th time iteration, t=0.0071
+in the 81-th time iteration, t=0.0081
+in the 91-th time iteration, t=0.0091
+solve the Time-Stokes-Darcy-Transport system: 38.0938
+terminal Time in program:0.01
+the solve-func time: 42.05
+compute Err time: 0.18
+uh_L2_error(2) = 8.0083e-05
+uh_H1_error(2) = 0.0033413
+ph_L2_error(2) = 0.00014037
+phih_L2_error(2) = 0.0027297
+phih_H1_error(2) = 0.10997
+ch_L2_error(2) = 2.6341e-05
+ch_H1_error(2) = 0.0016092
+------------------------------------------------------
+the 3-th cycle(i.e. the 3-th mesh)
+Stokes domain: [0,1]x[0,1].
+Darcy domain: [0,1]x[-1,0].
+Dt = 0.0001
+NT = 100
+condition number of Stokes-Darcy Matrix: 52532081.5084
+assemble Stokes-Darcy Matrix time: 1.6272
+in the 0-th time iteration, t=0
+in the 11-th time iteration, t=0.0011
+in the 21-th time iteration, t=0.0021
+in the 31-th time iteration, t=0.0031
+in the 41-th time iteration, t=0.0041
+in the 51-th time iteration, t=0.0051
+in the 61-th time iteration, t=0.0061
+in the 71-th time iteration, t=0.0071
+in the 81-th time iteration, t=0.0081
+in the 91-th time iteration, t=0.0091
+solve the Time-Stokes-Darcy-Transport system: 158.992
+terminal Time in program:0.01
+the solve-func time: 179.62
+compute Err time: 0.72
+uh_L2_error(3) = 1.4673e-05
+uh_H1_error(3) = 0.0014857
+ph_L2_error(3) = 5.1357e-05
+phih_L2_error(3) = 0.00068286
+phih_H1_error(3) = 0.054997
+ch_L2_error(3) = 6.4979e-06
+ch_H1_error(3) = 0.00080237
+------------------------------------------------------
+the 4-th cycle(i.e. the 4-th mesh)
+Stokes domain: [0,1]x[0,1].
+Darcy domain: [0,1]x[-1,0].
+Dt = 0.0001
+NT = 100
+condition number of Stokes-Darcy Matrix: 60595769.8463
+assemble Stokes-Darcy Matrix time: 7.1258
+in the 0-th time iteration, t=0
+in the 11-th time iteration, t=0.0011
+in the 21-th time iteration, t=0.0021
+in the 31-th time iteration, t=0.0031
+in the 41-th time iteration, t=0.0041
+in the 51-th time iteration, t=0.0051
+in the 61-th time iteration, t=0.0061
+in the 71-th time iteration, t=0.0071
+in the 81-th time iteration, t=0.0081
+in the 91-th time iteration, t=0.0091
+solve the Time-Stokes-Darcy-Transport system: 773.3074
+terminal Time in program:0.01
+the solve-func time: 943.65
+compute Err time: 1.64
+uh_L2_error(4) = 3.1894e-06
+uh_H1_error(4) = 0.00071248
+ph_L2_error(4) = 1.735e-05
+phih_L2_error(4) = 0.00017042
+phih_H1_error(4) = 0.027473
+ch_L2_error(4) = 1.62e-06
+ch_H1_error(4) = 0.00040093
+------------------------------------------------------
+------------------------------------------------------
+Table: Error
+  h_S        ||u-U_h||_0    ||u-U_h||_1   ||p-p_h||_0
+1.77e-01   3.26627e-04   6.65690e-03   3.98562e-04
+8.84e-02   8.00827e-05   3.34133e-03   1.40370e-04
+4.42e-02   1.46731e-05   1.48572e-03   5.13566e-05
+2.21e-02   3.18936e-06   7.12481e-04   1.73502e-05
+
+  h_D        ||phi-phi_h||_0    ||phi-phi_h||_1
+1.77e-01   1.08661e-02   2.19294e-01
+8.84e-02   2.72965e-03   1.09974e-01
+4.42e-02   6.82858e-04   5.49968e-02
+2.21e-02   1.70424e-04   2.74728e-02
+
+  h_c        ||c-c_h||_0   ||c-c_h||_1
+1.65e-01   1.10690e-04   3.25082e-03
+8.53e-02   2.63405e-05   1.60922e-03
+4.34e-02   6.49795e-06   8.02369e-04
+2.19e-02   1.62002e-06   4.00925e-04
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Table: Error rate
+  h_S       UhL2rate   UhH1rate   phL2rate
+1.77e-01   0.0000   0.0000   0.0000
+8.84e-02   2.0281   0.9944   1.5056
+4.42e-02   2.4483   1.1693   1.4506
+2.21e-02   2.2018   1.0602   1.5656
+
+  h_D       phihL2rate   phihH1rate
+1.77e-01   0.0000   0.0000
+8.84e-02   1.9930   0.9957
+4.42e-02   1.9991   0.9997
+2.21e-02   2.0025   1.0013
+
+  h_c       chL2rate   chH1rate
+1.65e-01   0.0000   0.0000
+8.53e-02   2.1804   1.0679
+4.34e-02   2.0725   1.0305
+2.19e-02   2.0304   1.0141
+
+------------------------------------------------------
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%
+%   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+%   %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+%       dgTimeDecoupledSDT2, 
+%       for the transport eqn, have inflow and outflow boundaryEdges.
+%   %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+%
+%
+%   RATE OF CONVERGENCE OF DG METHOD FOR THE StokesDarcyTransport EQNs IN 2D
+%
+%
+%
+%	YcZhang 18/11/2017
+%
+%   Last modified 18/11/2017
+%
+
+
+clc
+clearvars; close all;
+%% Setting
+% program setting
+option.L0 = 1; % to uniformrefine the mesh and generate an initial mesh 
+option.maxIt = 4; % to define the maximum circulation, to generate the Rate.
+option.printlevel = 1;
+option.plotflag = 1;
+
+% bases element setting
+option.basesType_Fu = 'P1';
+option.basesType_Fp = 'P0';
+option.basesType_Pp = 'P1';
+option.basesType_c = 'P1';
+    %> here, F standsfor fluid region, P standsfor porous region, and T standsfor Transport eq.
+    
+%% Time setting
+% choose the time scheme
+option.theta = 1; 
+    %> theta = 0, forward Euler (explicit Euler),
+    %> theta = 1, backward Euler (implicit Euler),
+    %> theta = 1/2, C-N.
+    
+% set the terminal time
+option.verifyCovergence = 'space'; 
+    % 'space' stands for we will vertify SPACE convergence order, so we will take Dt=1/1000,
+    % 'time' stands for we will veritfy TIME convergence order, so we will take very small h, and large Dt
+if strcmp(option.verifyCovergence, 'space')
+    option.Dt = 1/10000;
+    option.startingT = 0;
+    option.terminalT = 0.01;
+end
+
+
+%% penalty pars setting
+option.p_epsilon = -1; % -1, SIPG; 1, NIPG; 0, IIPG; This is for the StokesDarcy eqn.
+option.p_beta = 1;
+
+option.p_epsilon_c = -1; % this is for the Transport eqn.
+option.p_beta_c = 1;
+
+%> for the NIPG
+if option.p_epsilon == 1
+    option.p_sigma = 1;
+end 
+
+if option.p_epsilon_c == 1
+    option.p_sigma_c = 19;
+end 
+
+%> for the SIPG or IIPG
+%REPLACE_WITH_DASH_DASH- for the Stokes-Darcy
+if option.p_epsilon ~= 1 && basesType2degreek(option.basesType_Fu) == 1
+    option.p_sigma = 19;
+elseif option.p_epsilon ~= 1 && basesType2degreek(option.basesType_Fu) == 2
+    option.p_sigma = 18;
+elseif option.p_epsilon ~= 1 && basesType2degreek(option.basesType_Fu) == 3
+    option.p_sigma = 36;
+elseif option.p_epsilon ~= 1 && basesType2degreek(option.basesType_Fu) == 4
+    option.p_sigma = 78;
+end 
+
+%REPLACE_WITH_DASH_DASH- for the Transport eqn
+if option.p_epsilon_c ~= 1 && basesType2degreek(option.basesType_c) == 1
+    option.p_sigma_c = 19;
+elseif option.p_epsilon_c ~= 1 && basesType2degreek(option.basesType_c) == 2
+    option.p_sigma_c = 96;
+elseif option.p_epsilon_c ~= 1 && basesType2degreek(option.basesType_c) == 3
+    option.p_sigma_c = 36;
+elseif option.p_epsilon_c ~= 1 && basesType2degreek(option.basesType_c) == 4
+    option.p_sigma_c = 78;
+end 
+
+
+%REPLACE_WITH_DASH_DASH- for the Transport Adap Diffusivity Edges
+option.p_epsilon1 = option.p_epsilon_c;
+option.p_sigma1 = option.p_sigma_c;
+ 
+%% pde setting
+pde = TimeDecoupledSDTData2(0,1); % input: (coeff_case,u_case)
+
+option.Darcy_p_sigma = pde.K; % this is to control the penalty coefficient of Daryc eqn.
+
+%% equation
+dgTimeDecoupledSDTEqn2(pde,option);
+
+%REPLACE_WITH_DASH_DASH end function
+
+
+##### SOURCE END #####
+--></body></html>
