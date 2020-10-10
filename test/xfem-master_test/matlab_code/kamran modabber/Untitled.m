@@ -1,3 +1,0 @@
-clc
-clear
-deploytool
